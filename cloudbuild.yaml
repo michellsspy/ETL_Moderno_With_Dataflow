@@ -1,0 +1,83 @@
+# Este Cloud Build executa testes, builda UMA imagem
+# e publica TRÊS Flex Templates (um para cada camada).
+
+timeout: '1600s'
+steps:
+  # 1. Instalar dependências de dev e rodar testes
+  - name: 'python:3.9'
+    id: Testar
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        pip install -r requirements-dev.txt
+        pytest tests/
+
+  # 2. Construir a imagem de container ÚNICA
+  # Esta imagem contém TODO o código (raw, trusted, refined)
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build-Image
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/hotelaria-pipeline:latest' # Imagem ÚNICA
+      - '.' # Usar o Dockerfile da raiz
+    waitFor: ['Testar']
+
+  # 3. Enviar a imagem para o Artifact Registry (ou GCR)
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Push-Image
+    args: ['push', 'gcr.io/$PROJECT_ID/hotelaria-pipeline:latest']
+    waitFor: ['Build-Image']
+
+  # 4. PUBLICAR O TEMPLATE DA RAW
+  - name: 'gcr.io/google-cloud-sdk/google-cloud-sdk'
+    id: Publish-Raw-Template
+    entrypoint: 'gcloud'
+    args:
+      - 'dataflow'
+      - 'flex-template'
+      - 'build'
+      - 'gs://${_BUCKET_TEMPLATES}/templates/hotelaria_raw_pipeline.json' # Destino 1
+      - '--image=gcr.io/$PROJECT_ID/hotelaria-pipeline:latest' # Imagem buildada
+      - '--sdk-language=PYTHON'
+      # Entrypoint 1
+      - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.raw.main_raw'
+    waitFor: ['Push-Image']
+
+  # 5. PUBLICAR O TEMPLATE DA TRUSTED
+  - name: 'gcr.io/google-cloud-sdk/google-cloud-sdk'
+    id: Publish-Trusted-Template
+    entrypoint: 'gcloud'
+    args:
+      - 'dataflow'
+      - 'flex-template'
+      - 'build'
+      - 'gs://${_BUCKET_TEMPLATES}/templates/hotelaria_trusted_pipeline.json' # Destino 2
+      - '--image=gcr.io/$PROJECT_ID/hotelaria-pipeline:latest' # Mesma imagem
+      - '--sdk-language=PYTHON'
+      # Entrypoint 2
+      - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.trusted.main_trusted'
+    waitFor: ['Push-Image']
+
+  # 6. PUBLICAR O TEMPLATE DA REFINED
+  - name: 'gcr.io/google-cloud-sdk/google-cloud-sdk'
+    id: Publish-Refined-Template
+    entrypoint: 'gcloud'
+    args:
+      - 'dataflow'
+      - 'flex-template'
+      - 'build'
+      - 'gs://${_BUCKET_TEMPLATES}/templates/hotelaria_refined_pipeline.json' # Destino 3
+      - '--image=gcr.io/$PROJECT_ID/hotelaria-pipeline:latest' # Mesma imagem
+      - '--sdk-language=PYTHON'
+      # Entrypoint 3
+      - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.refined.main_refined'
+    waitFor: ['Push-Image']
+
+# Variáveis de substituição (podem ser configuradas no Trigger do Cloud Build)
+substitutions:
+  _BUCKET_TEMPLATES: 'bk-etl-hotelaria' # Bucket onde os templates .json serão salvos
+
+images:
+  - 'gcr.io/$PROJECT_ID/hotelaria-pipeline:latest'
