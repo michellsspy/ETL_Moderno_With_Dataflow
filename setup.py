@@ -12,7 +12,7 @@ setuptools.setup(
     install_requires=[
         # As dependências são gerenciadas pelo requirements.txt
         # e instaladas no Dockerfile, mas é boa prática listar aqui também.
-        'apache-beam[gcp]>=2.50.0',
+        'apache-beam[gcp]>=2.64.0',
         'google-cloud-storage>=2.0.0',
         'google-cloud-bigquery>=3.0.0',
     ],

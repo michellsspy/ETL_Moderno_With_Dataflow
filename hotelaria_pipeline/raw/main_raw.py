@@ -1,7 +1,7 @@
 import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.pvalue import AsDict
-
+from hotelaria_pipeline import schemas
 from hotelaria_pipeline.pipeline_options import RawPipelineOptions
 from hotelaria_pipeline.raw.transforms import GetFolderNames, GcsCsvToBqUpsert
 from hotelaria_pipeline.utils import setup_logging, parse_pk_map_json
@@ -25,6 +25,18 @@ def run():
         logger.error(f"Falha ao parsear pk_map_json. Encerrando. Erro: {e}")
         return
 
+# Mapeia o nome da tabela (chave do pk_map) para o objeto SchemaField
+    SCHEMA_MAP = {
+        "raw_consumos": schemas.SCHEMA_RAW_CONSUMOS,
+        "raw_faturas": schemas.SCHEMA_RAW_FATURAS,
+        "raw_hospedes": schemas.SCHEMA_RAW_HOSPEDES,
+        "raw_hoteis": schemas.SCHEMA_RAW_HOTEIS,
+        "raw_quartos": schemas.SCHEMA_RAW_QUARTOS,
+        "raw_reservas": schemas.SCHEMA_RAW_RESERVAS,
+        "raw_reservas_ota": schemas.SCHEMA_RAW_RESERVAS_OTA,
+    }
+    logger.info("Mapa de Schemas carregado.")
+
     # 3. Instanciar PTransforms com estado (clientes, etc)
     get_folder_names_transform = GetFolderNames(
         bucket_name=raw_options.bucket_name,
@@ -36,7 +48,8 @@ def run():
         dataset_id=raw_options.dataset_id_raw,
         bucket_name=raw_options.bucket_name,
         gcs_transient_prefix=raw_options.gcs_transient_prefix,
-        pk_map=pk_map
+        pk_map=pk_map,
+        schema_map=SCHEMA_MAP
     )
 
     # 4. Definição do Pipeline
