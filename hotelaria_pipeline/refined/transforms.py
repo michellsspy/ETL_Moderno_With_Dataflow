@@ -42,28 +42,33 @@ class AggregateAndFormat(beam.PTransform):
     def __init__(self, processing_date):
         self.processing_date = processing_date
 
+    # Dentro da classe AggregateAndFormat
     def _sum_metrics(self, elements):
-        # elements é uma lista de dicionários 'value'
-        logger.debug(f"[_sum_metrics] Aggregating: {elements}") # Log para debug (opcional)
+        # elements é um iterável (ex: _ReiterableChain) de dicionários 'value'
+        # logger.debug(f"[_sum_metrics] Aggregating elements...") # Log pode ser útil
 
-        # --- CORREÇÃO: Usar .get() para segurança ---
-        receita_total = sum(item.get('receita', 0.0) for item in elements)
-        reservas_totais = sum(item.get('reservas', 0) for item in elements)
+        receita_total = 0.0
+        reservas_totais = 0
+        nome_hotel = "N/A" # Valores padrão caso 'elements' seja vazio
+        cidade_hotel = "N/A"
+        first_element_processed = False
 
-        # Tratar caso de lista vazia (embora raro com CombinePerKey)
-        if not elements:
-            return {
-                "receita_total_dia": 0.0,
-                "reservas_confirmadas_dia": 0,
-                "nome_hotel": "N/A", # Ou algum valor padrão
-                "cidade_hotel": "N/A"
-            }
+        # --- CORREÇÃO: Iterar para calcular e pegar dados ---
+        for item in elements:
+            # Pega os dados do hotel APENAS do primeiro item
+            if not first_element_processed:
+                nome_hotel = item.get('nome_hotel', "N/A")
+                cidade_hotel = item.get('cidade_hotel', "N/A")
+                first_element_processed = True
 
-        # Pega os dados do hotel (serão os mesmos para a chave)
-        # Usar .get() também por segurança
-        nome_hotel = elements[0].get('nome_hotel', "N/A")
-        cidade_hotel = elements[0].get('cidade_hotel', "N/A")
+            # Acumula as métricas
+            receita_total += item.get('receita', 0.0)
+            reservas_totais += item.get('reservas', 0)
         # --- FIM DA CORREÇÃO ---
+
+        # O tratamento de caso vazio não é estritamente necessário
+        # pois CombinePerKey geralmente não chama o combiner para chaves sem elementos,
+        # mas os valores padrão acima garantem robustez.
 
         return {
             "receita_total_dia": receita_total,
