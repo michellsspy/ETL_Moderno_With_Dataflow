@@ -44,14 +44,27 @@ class AggregateAndFormat(beam.PTransform):
 
     def _sum_metrics(self, elements):
         # elements é uma lista de dicionários 'value'
-        receita_total = sum(item['receita'] for item in elements)
-        reservas_totais = sum(item['reservas'] for item in elements)
-        
+        logger.debug(f"[_sum_metrics] Aggregating: {elements}") # Log para debug (opcional)
+
+        # --- CORREÇÃO: Usar .get() para segurança ---
+        receita_total = sum(item.get('receita', 0.0) for item in elements)
+        reservas_totais = sum(item.get('reservas', 0) for item in elements)
+
+        # Tratar caso de lista vazia (embora raro com CombinePerKey)
+        if not elements:
+            return {
+                "receita_total_dia": 0.0,
+                "reservas_confirmadas_dia": 0,
+                "nome_hotel": "N/A", # Ou algum valor padrão
+                "cidade_hotel": "N/A"
+            }
+
         # Pega os dados do hotel (serão os mesmos para a chave)
-        # Em um caso real, tratar exceção se 'elements' estiver vazio
-        nome_hotel = elements[0]['nome_hotel']
-        cidade_hotel = elements[0]['cidade_hotel']
-        
+        # Usar .get() também por segurança
+        nome_hotel = elements[0].get('nome_hotel', "N/A")
+        cidade_hotel = elements[0].get('cidade_hotel', "N/A")
+        # --- FIM DA CORREÇÃO ---
+
         return {
             "receita_total_dia": receita_total,
             "reservas_confirmadas_dia": reservas_totais,

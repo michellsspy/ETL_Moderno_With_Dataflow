@@ -25,8 +25,7 @@ EXPECTED_VALID_OUTPUT = [
         'id_reserva': 'R100', 'id_hospede': 'H200',
         'status_reserva': 'CONFIRMED', 'email_hospede': 'test@email.com',
         'valor_total_reserva': 150.75,
-        'dt_processamento': '2025-01-01',
-        'dt_insert': 'mock_timestamp' # Iremos ignorar este campo na asserção
+        'dt_processamento': '2025-01-01'
     }
 ]
 
