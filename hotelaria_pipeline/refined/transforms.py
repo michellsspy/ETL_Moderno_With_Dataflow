@@ -5,33 +5,55 @@ logger = logging.getLogger(__name__)
 
 class ExtractDataParaAgregacao(beam.DoFn):
     """Prepara os dados para a agregação, criando a chave (id_hotel, data)."""
-    
+
     def process(self, element, processing_date):
         try:
-            # Exemplo de lógica de negócios:
-            # Queremos agregar receita por hotel, por dia.
-            
-            id_hotel = element['id_hotel']
-            data_checkin = element['data_checkin'] # Assumindo que é um objeto Date
-            receita = element['valor_total_reserva']
-            
+            # --- Adicionar verificação e logs ---
+            if not isinstance(element, dict):
+                logger.warning(f"Elemento inesperado (não é dict): {element}")
+                return # Pular elemento não-dicionário
+
+            id_hotel = element.get('id_hotel')
+            data_checkin = element.get('data_checkin') # Assumindo que é um objeto Date ou string ISO
+            receita_val = element.get('valor_total_reserva')
+            nome_hotel_val = element.get('nome_hotel')
+            cidade_hotel_val = element.get('cidade_hotel')
+
+            # Verificar se os campos essenciais existem
+            if id_hotel is None or data_checkin is None or receita_val is None:
+                logger.warning(f"Campos essenciais ausentes para agregação: {element}")
+                return # Pular registro incompleto
+
+            # Tentar converter receita para float
+            try:
+                receita_float = float(receita_val)
+            except (ValueError, TypeError):
+                logger.warning(f"Não foi possível converter 'valor_total_reserva' para float: {receita_val} em {element}")
+                return # Pular registro com receita inválida
+
+            # Garantir que data_checkin seja string ISO para a chave
+            if hasattr(data_checkin, 'isoformat'): # Se for objeto Date/Datetime
+                 data_str = data_checkin.isoformat()
+            else: # Se já for string (ou outro tipo)
+                 data_str = str(data_checkin)
+
             # Chave de agregação
-            key = f"{id_hotel}|{data_checkin.isoformat()}"
-            
+            key = f"{id_hotel}|{data_str}"
+
             # Dados a serem agregados
             value = {
-                "receita": float(receita),
+                "receita": receita_float,
                 "reservas": 1,
-                # Salva os dados do hotel para não precisar de outro join
-                "nome_hotel": element['nome_hotel'],
-                "cidade_hotel": element['cidade_hotel']
+                "nome_hotel": nome_hotel_val if nome_hotel_val is not None else "N/A",
+                "cidade_hotel": cidade_hotel_val if cidade_hotel_val is not None else "N/A"
             }
-            
+            # --- Fim das adições/verificações ---
+
             yield (key, value)
-            
+
         except Exception as e:
-            logger.warning(f"Erro ao extrair dados para agregação: {e} | Dados: {element}")
-            # Ignora o registro falho na agregação
+            # Logar o erro mas não parar o pipeline inteiro por causa de um registro
+            logger.error(f"Erro ao extrair dados para agregação: {e} | Dados: {element}", exc_info=True)
 
 
 class AggregateAndFormat(beam.PTransform):
@@ -43,32 +65,24 @@ class AggregateAndFormat(beam.PTransform):
         self.processing_date = processing_date
 
     # Dentro da classe AggregateAndFormat
+# Dentro da classe AggregateAndFormat
     def _sum_metrics(self, elements):
-        # elements é um iterável (ex: _ReiterableChain) de dicionários 'value'
-        # logger.debug(f"[_sum_metrics] Aggregating elements...") # Log pode ser útil
-
         receita_total = 0.0
         reservas_totais = 0
-        nome_hotel = "N/A" # Valores padrão caso 'elements' seja vazio
+        nome_hotel = "N/A"
         cidade_hotel = "N/A"
         first_element_processed = False
 
-        # --- CORREÇÃO: Iterar para calcular e pegar dados ---
         for item in elements:
-            # Pega os dados do hotel APENAS do primeiro item
             if not first_element_processed:
                 nome_hotel = item.get('nome_hotel', "N/A")
                 cidade_hotel = item.get('cidade_hotel', "N/A")
                 first_element_processed = True
 
-            # Acumula as métricas
+            # ERRO ESTAVA AQUI: As somas estavam fora do loop no código anterior
+            # Esta versão (m-96) já está correta, mas vamos confirmar.
             receita_total += item.get('receita', 0.0)
             reservas_totais += item.get('reservas', 0)
-        # --- FIM DA CORREÇÃO ---
-
-        # O tratamento de caso vazio não é estritamente necessário
-        # pois CombinePerKey geralmente não chama o combiner para chaves sem elementos,
-        # mas os valores padrão acima garantem robustez.
 
         return {
             "receita_total_dia": receita_total,

@@ -2,7 +2,7 @@
 
 timeout: '1600s'
 steps:
-  # 1. Testar (Mantido)
+  # 1. Testar
   - name: 'python:3.9'
     id: Testar
     entrypoint: 'bash'
