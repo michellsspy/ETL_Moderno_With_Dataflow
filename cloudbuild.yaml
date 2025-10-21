@@ -1,4 +1,5 @@
-# Este Cloud Build executa testes, builda UMA imagem e publica TRÊS Flex Templates (um para cada camada).
+# Este Cloud Build executa testes, builda UMA imagem
+# e publica TRÊS Flex Templates (um para cada camada).
 
 timeout: '1600s'
 steps:
