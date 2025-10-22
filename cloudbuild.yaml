@@ -6,7 +6,11 @@ steps:
   - name: 'python:3.9'
     id: Testar
     entrypoint: 'bash'
-    args: ['-c', 'pip install -r requirements-dev.txt && pytest tests/']
+    args:
+      - '-c'
+      - |
+        pip install -r requirements-dev.txt
+        pytest tests/ # <-- Roda todos os testes em tests/
 
   # 2. Construir Imagem (Usando Artifact Registry)
   - name: 'gcr.io/cloud-builders/docker'
