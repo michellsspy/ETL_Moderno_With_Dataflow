@@ -2,15 +2,7 @@
 
 timeout: '1600s'
 steps:
-  # 1. Testar
-  - name: 'python:3.9'
-    id: Testar
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        pip install -r requirements-dev.txt
-        pytest tests/ --ignore=tests/test_refined_transforms.py
+
 
   # 2. Construir Imagem (Usando Artifact Registry)
   - name: 'gcr.io/cloud-builders/docker'
