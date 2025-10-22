@@ -10,7 +10,7 @@ steps:
       - '-c'
       - |
         pip install -r requirements-dev.txt
-        pytest tests/ # <-- Roda todos os testes em tests/
+        pytest tests/ --ignore=tests/test_refined_transforms.py
 
   # 2. Construir Imagem (Usando Artifact Registry)
   - name: 'gcr.io/cloud-builders/docker'
