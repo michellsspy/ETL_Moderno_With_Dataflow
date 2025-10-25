@@ -44,9 +44,9 @@ steps:
       # --- CORREÇÃO PRINCIPAL: Usar --image apontando para Artifact Registry ---
       - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/hotelaria-pipelines-repo/hotelaria-pipeline:latest'
       - '--sdk-language=PYTHON'
-      #- '--metadata-file=metadata_raw.json' # Adicione se usar metadados
+      - '--metadata-file=metadata_raw.json' # Adicione se usar metadados
       # Se não usar metadados, defina o módulo via env var:
-      - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.raw.main_raw'
+      #- '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.raw.main_raw'
     waitFor: ['Push-Image']
 
 # Variável de substituição (Configurada no Trigger)
