@@ -1,0 +1,7 @@
+{
+  "name": "Pipeline Refined de Hotelaria",
+  "description": "Processa dados refined da hotelaria.",
+  "parameters": [],
+  "sdkInfo": { "language": "PYTHON" },
+  "mainClass": "hotelaria_pipeline.refined.main_refined"
+}

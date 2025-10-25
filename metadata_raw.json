@@ -1,0 +1,7 @@
+{
+  "name": "Pipeline Raw de Hotelaria",
+  "description": "Processa dados brutos da hotelaria.",
+  "parameters": [],
+  "sdkInfo": { "language": "PYTHON" },
+  "mainClass": "hotelaria_pipeline.raw.main_raw"
+}
