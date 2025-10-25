@@ -49,7 +49,7 @@ steps:
       - '--sdk-language=PYTHON'
       - '--metadata-file=metadata_raw.json' # Adicione se usar metadados
       # Se não usar metadados, defina o módulo via env var:
-      # - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.raw.main_raw'
+      - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.raw.main_raw'
     waitFor: ['Push-Image']
 
   # 5. Publicar Template TRUSTED (Apontando para Imagem no Artifact Registry)
@@ -66,7 +66,7 @@ steps:
       - '--sdk-language=PYTHON'
       - '--metadata-file=metadata_trusted.json' # Adicione se usar metadados
       # Se não usar metadados, defina o módulo via env var:
-      # - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.trusted.main_trusted'
+      - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.trusted.main_trusted'
     waitFor: ['Push-Image']
 
   ## 6. Publicar Template REFINED (Apontando para Imagem no Artifact Registry)
@@ -83,7 +83,7 @@ steps:
   #    - '--sdk-language=PYTHON'
   #    - '--metadata-file=metadata_refined.json' # Adicione se usar metadados
   #    # Se não usar metadados, defina o módulo via env var:
-  #    # - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.refined.main_refined'
+  #    - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.refined.main_refined'
   #  waitFor: ['Push-Image']
 
 # Variável de substituição (Configurada no Trigger)
