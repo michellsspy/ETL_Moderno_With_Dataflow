@@ -18,6 +18,7 @@ COPY . .
 # 6. Instalar o pacote (hotelaria_pipeline)
 # Isso torna 'hotelaria_pipeline.raw.main_raw' etc. importáveis
 RUN pip install .
+RUN pip install -e .
 
 # NENHUM 'ENV FLEX_TEMPLATE_PYTHON_PY_MODULE' aqui!
 # Isso é definido pelo 'gcloud flex-template build' no cloudbuild.yaml

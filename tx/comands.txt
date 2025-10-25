@@ -1,4 +1,4 @@
-# RODAR LOCALMENTE
+# RODAR LOCALMENTE CAMADA RAW
 1- INSTALA PACOTE EXECUTANDO NA RAIZ
     pip install -e .
 
@@ -28,3 +28,37 @@ python -m hotelaria_pipeline.raw.main_raw \
     --temp_location=gs://bk-etl-hotelaria/temp_location/ \
     --setup_file=./setup.py \
     --job_name="hotelaria-raw-manual-$(date +%Y%m%d-%H%M%S)" # Adiciona nome ao job
+
+
+
+
+# RODAR LOCALMENTE TRUSTED
+1- INSTALA PACOTE EXECUTANDO NA RAIZ
+    pip install -e .
+
+2- RODA O COMANDO ABAIXO PARA INICIAR O MAIN
+python -m hotelaria_pipeline.trusted.main_trusted \
+    --project_id=etl-hoteis \
+    --dataset_id_trusted=trusted_hotelaria \
+    --pk_map_json='{"trusted_consumos": ["consumo_id"], "trusted_faturas": ["fatura_id"], "trusted_hospedes": ["hospede_id"], "trusted_hoteis": ["hotel_id"], "trusted_quartos": ["quarto_id"], "trusted_reservas": ["reserva_id"], "trusted_reservas_ota": ["ota_reserva_id"]}' \
+    --runner=DirectRunner \
+    --temp_location=gs://bk-etl-hotelaria/temp_location/
+
+RODAR NO DATAFLOW JOB
+# 1. Certifique-se de que o pip está atualizado (boa prática)
+pip install --upgrade pip
+
+# 2. Instale as ferramentas de build e setuptools
+pip install build setuptools wheel
+
+python -m hotelaria_pipeline.trusted.main_trusted \
+    --project_id=etl-hoteis \
+    --project=etl-hoteis \
+    --dataset_id_trusted=trusted_hotelaria \
+    --pk_map_json='{"trusted_consumos": ["consumo_id"], "trusted_faturas": ["fatura_id"], "trusted_hospedes": ["hospede_id"], "trusted_hoteis": ["hotel_id"], "trusted_quartos": ["quarto_id"], "trusted_reservas": ["reserva_id"], "trusted_reservas_ota": ["ota_reserva_id"]}' \
+    \
+    --runner=DataflowRunner \
+    --region=us-central1 \
+    --temp_location=gs://bk-etl-hotelaria/temp_location/ \
+    --setup_file=./setup.py \
+    --job_name="hotelaria-trusted-manual-$(date +%Y%m%d-%H%M%S)" # Adiciona nome ao job
