@@ -11,7 +11,7 @@ def pipeline_options():
         '--project_id=test-project', # Usando project_id que funcionou no DirectRunner
         '--dataset_id_raw=test_raw',
         '--dataset_id_trusted=test_trusted',
-        '--dataset_id_refined=test_refined',
+        #'--dataset_id_refined=test_refined',
         '--bucket_name=test-bucket',
         '--pk_map_json={"raw_test": ["id"]}', # Schema simples para teste
         '--processing_date=2025-01-01',
