@@ -52,40 +52,6 @@ steps:
       - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.raw.main_raw'
     waitFor: ['Push-Image']
 
-  ## 5. Publicar Template TRUSTED (Apontando para Imagem no Artifact Registry)
-  #- name: 'google/cloud-sdk:latest' # Imagem atualizada do gcloud
-  #  id: Publish-Trusted-Template
-  #  entrypoint: 'gcloud'
-  #  args:
-  #    - 'dataflow'
-  #    - 'flex-template'
-  #    - 'build'
-  #    - 'gs://${_BUCKET_TEMPLATES}/templates/hotelaria_trusted_pipeline.json'
-  #    # --- CORREÇÃO PRINCIPAL: Usar --image apontando para Artifact Registry ---
-  #    - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/hotelaria-pipelines-repo/hotelaria-pipeline:latest'
-  #    - '--sdk-language=PYTHON'
-  #    - '--metadata-file=metadata_trusted.json' # Adicione se usar metadados
-  #    # Se não usar metadados, defina o módulo via env var:
-  #    - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.trusted.main_trusted'
-  #  waitFor: ['Push-Image']
-
-  ## 6. Publicar Template REFINED (Apontando para Imagem no Artifact Registry)
-  #- name: 'google/cloud-sdk:latest' # Imagem atualizada do gcloud
-  #  id: Publish-Refined-Template
-  #  entrypoint: 'gcloud'
-  #  args:
-  #    - 'dataflow'
-  #    - 'flex-template'
-  #    - 'build'
-  #    - 'gs://${_BUCKET_TEMPLATES}/templates/hotelaria_refined_pipeline.json'
-  #    # --- CORREÇÃO PRINCIPAL: Usar --image apontando para Artifact Registry ---
-  #    - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/hotelaria-pipelines-repo/hotelaria-pipeline:latest'
-  #    - '--sdk-language=PYTHON'
-  #    - '--metadata-file=metadata_refined.json' # Adicione se usar metadados
-  #    # Se não usar metadados, defina o módulo via env var:
-  #    - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.refined.main_refined'
-  #  waitFor: ['Push-Image']
-
 # Variável de substituição (Configurada no Trigger)
 substitutions:
   _BUCKET_TEMPLATES: 'bk-etl-hotelaria' # Valor Padrão
