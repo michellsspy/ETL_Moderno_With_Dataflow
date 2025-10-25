@@ -1,8 +1,6 @@
 import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.pvalue import AsDict
-
-from hotelaria_pipeline.pipeline_options import TrustedPipelineOptions
 from hotelaria_pipeline.schemas import SCHEMA_TRUSTED_RESERVAS
 from hotelaria_pipeline.trusted.transforms import StandardizeAndValidate, LeftJoin
 from hotelaria_pipeline.utils import setup_logging
@@ -13,7 +11,7 @@ def run():
     
     # 1. Configuração e Parse de Opções
     options = PipelineOptions(flags=None)
-    trusted_options = options.view_as(TrustedPipelineOptions)
+    trusted_options = options
     
     logger = setup_logging()
     logger.info("Iniciando pipeline TRUSTED (BQ Raw -> BQ Trusted)")

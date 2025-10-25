@@ -54,12 +54,11 @@ class GcsCsvToBqUpsert(beam.DoFn):
     TAG_FAILED = 'failed'
     TAG_SUCCESS = 'success'
 
-    def __init__(self, projeto, dataset_id, bucket_name, gcs_transient_prefix, pk_map: dict, schema_map: dict):
+    def __init__(self, projeto, dataset_id, bucket_name, gcs_transient_prefix: dict, schema_map: dict):
         self.projeto = projeto
         self.dataset_id = dataset_id
         self.bucket_name = bucket_name
         self.gcs_transient_prefix = gcs_transient_prefix
-        self.pk_map = pk_map
         self.schema_map = schema_map
         self.storage_client = None
         self.bq_client = None
@@ -88,9 +87,6 @@ class GcsCsvToBqUpsert(beam.DoFn):
             temp_table_id = f"{self.projeto}.{self.dataset_id}.{temp_table_name}"
             logger.info(f"[{folder_name}] Iniciando UPSERT para: {table_id} (via staging: {temp_table_id})")
 
-            # 2. Obter PK
-            pk_cols = self.pk_map.get(table_name);
-            if not pk_cols: raise ValueError(f"Nenhuma PK definida para a tabela: {table_name}")
 
             # 3. Obter Schemas (Final e Staging)
             table_schema_final = self.schema_map.get(table_name);

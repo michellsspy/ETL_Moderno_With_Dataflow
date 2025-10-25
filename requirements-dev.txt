@@ -1,4 +1,0 @@
--r requirements.txt
-pytest>=7.0.0
-# Adicionar 'unittest.mock' se estiver no Python < 3.3, 
-# mas as imagens base do Dataflow são mais novas.

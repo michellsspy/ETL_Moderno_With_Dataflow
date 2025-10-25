@@ -1,7 +1,0 @@
-{
-  "name": "Pipeline Trusted de Hotelaria",
-  "description": "Processa dados trusted da hotelaria.",
-  "parameters": [],
-  "sdkInfo": { "language": "PYTHON" },
-  "mainClass": "hotelaria_pipeline.trusted.main_trusted"
-}

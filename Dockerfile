@@ -15,17 +15,23 @@ WORKDIR ${WORKDIR}
 RUN apt-get update && apt-get install -y libpq-dev
 RUN pip install build setuptools wheel
 
-# 4. Copiar e instalar dependências Python
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Variáveis específicas do template
+ENV FLEX_TEMPLATE_PYTHON_PY_FILE=${WORKDIR}/main.py
+ENV FLEX_TEMPLATE_PYTHON_SETUP_FILE=${WORKDIR}/setup.py
+ENV FLEX_TEMPLATES_TAIL_CMD_TIMEOUT_IN_SECS=30
+ENV FLEX_TEMPLATES_NUM_LOG_LINES=1000
 
-# 5. Copiar TODO o código-fonte do pipeline
+# 4. Copiar TODO o código-fonte do pipeline
 COPY . .
 
-# 6. Instalar o pacote (hotelaria_pipeline)
-# Isso torna 'hotelaria_pipeline.raw.main_raw' etc. importáveis
-RUN pip install .
-RUN pip install -e .
+# 5. Copiar e instalar dependências Python
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+
+# 6. Lista o ambiente
+RUN ls -la /opt/apache/beam && \
+    ls -la /opt/google/dataflow/python_template_launcher && \
+    ls -la ${WORKDIR}
 
 # NENHUM 'ENV FLEX_TEMPLATE_PYTHON_PY_MODULE' aqui!
 # Isso é definido pelo 'gcloud flex-template build' no cloudbuild.yaml

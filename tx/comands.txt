@@ -1,3 +1,20 @@
+# BUILDANDO A IMAGEM MANUALMENTE
+#--->> Set project
+gcloud auth application-default set-quota-project etl-hoteis
+
+gcloud artifacts repositories create etl-transient-to-raw \
+    --repository-format=docker \
+    --location=us-central1
+
+
+gcloud auth configure-docker us-central1-docker.pkg.dev
+
+
+#--->>> Sempre que alterar algo, precisa executar os comandos abaixo novamente
+
+gcloud builds submit --tag us-central1-docker.pkg.dev/etl-hotel/etl-transient-to-raw/etl-transient-dev:latest .
+
+
 # RODAR LOCALMENTE CAMADA RAW
 1- INSTALA PACOTE EXECUTANDO NA RAIZ
     pip install -e .
