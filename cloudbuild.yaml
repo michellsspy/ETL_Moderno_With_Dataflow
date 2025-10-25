@@ -10,10 +10,7 @@ steps:
       - '-c'
       - |
         pip install -r requirements-dev.txt
-        # Executa testes ignorando raw E refined (Apenas Trusted)
-        pytest tests/ --ignore=tests/test_raw_transforms.py --ignore=tests/test_refined_transforms.py
-        # Executa testes ignorando raw E trusted (Apenas Refined) - SE precisar testar refined separadamente
-        # pytest tests/ --ignore=tests/test_raw_transforms.py --ignore=tests/test_trusted_transforms.py
+        pytest tests/test_raw_transforms.py
 
   # 2. Construir Imagem (Usando Artifact Registry)
   - name: 'gcr.io/cloud-builders/docker' # Usar 'gcr.io/cloud-builders/docker' ainda é comum para construir
@@ -47,7 +44,7 @@ steps:
       # --- CORREÇÃO PRINCIPAL: Usar --image apontando para Artifact Registry ---
       - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/hotelaria-pipelines-repo/hotelaria-pipeline:latest'
       - '--sdk-language=PYTHON'
-      - '--metadata-file=metadata_raw.json' # Adicione se usar metadados
+      #- '--metadata-file=metadata_raw.json' # Adicione se usar metadados
       # Se não usar metadados, defina o módulo via env var:
       - '--env=FLEX_TEMPLATE_PYTHON_PY_MODULE=hotelaria_pipeline.raw.main_raw'
     waitFor: ['Push-Image']
